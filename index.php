@@ -15,6 +15,6 @@
  *
  */
 
-require_once('emailTOCPlugin.inc.php');
+require_once('emailIssueTocPlugin.inc.php');
 
 return new emailTOCPlugin();
