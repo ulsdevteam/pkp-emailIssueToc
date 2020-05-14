@@ -8,7 +8,7 @@
   * Plugin version information.
   -->
 <version>
-	<application>emailIssueTOC</application>
+	<application>emailIssueToc</application>
 	<type>plugins.generic</type>
 	<release>1.0.0.1</release>
 	<date>2020-05-14</date>

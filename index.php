@@ -17,4 +17,4 @@
 
 require_once('emailIssueTocPlugin.inc.php');
 
-return new emailTOCPlugin();
+return new emailIssueTocPlugin();
