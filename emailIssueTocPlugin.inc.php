@@ -95,8 +95,8 @@ class emailIssueTocPlugin extends GenericPlugin{
 				$issueDao = DAORegistry::getDAO('IssueDAO');
 				$templateMgr->assign('issue', $issueDao->getById($issueId));
 				$message = $templateMgr->fetch('controllers/grid/issues/issueToc.tpl');
-				return false;
 			}
 		}
+		return false;
 	}
 }
