@@ -10,7 +10,7 @@ Plugin for OJS, sends the table of content in the notification email
 
 Install this as a "generic" plugin in OJS.  The preferred installation method is through the Plugin Gallery.  To install manually via the filesystem, extract the contents of this archive to a "emailIssueToc" directory under "plugins/generic" in your OJS root.  To install via Git submodule, target that same directory path: `git submodule add https://github.com/shanu17/pkp-emailIssueToc plugins/generic/emailIssueToc` and `git submodule update --init --recursive plugins/generic/emailIssueToc`.  Run the upgrade script to register this plugin, e.g.: `php tools/upgrade.php upgrade`
 
-Login as a Site Administrator and navigate to any context.  Enable the plugin via Login -> Settings -> Website -> Plugins -> Email Issue TOC -> Enable.
+Login as a Journal Manager and navigate to any context.  Enable the plugin via Login -> Settings -> Website -> Plugins -> Email Issue TOC -> Enable.
 
 ## Author / License
 
