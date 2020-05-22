@@ -88,37 +88,16 @@ class emailIssueTocPlugin extends GenericPlugin{
 		$request = $this->getRequest();
 		$notification = $args[0];
 		$message =& $args[1];
-		$journal = $request->getJournal();
 		if ($notification->getType() == NOTIFICATION_TYPE_PUBLISHED_ISSUE_WITH_TOC) {
 			if ($notification->getAssocType() == ASSOC_TYPE_ISSUE) {
 				$issueId = $notification->getAssocId();
 				$templateMgr = TemplateManager::getManager($request);
 				$issueDao = DAORegistry::getDAO('IssueDAO');
 				$issue = $issueDao->getById($issueId);
-				$sections = Application::get()->getSectionDao()->getByIssueId($issueId);
-				$issueSubmissionsInSection = [];
-				foreach ($sections as $section) {
-					$issueSubmissionsInSection[$section->getId()] = [
-						'title' => $section->getLocalizedTitle(),
-						'articles' => [],
-					];
-				}
-				import('classes.submission.Submission');
-				$issueSubmissions = iterator_to_array(Services::get('submission')->getMany([
-					'contextId' => $journal->getId(),
-					'issueIds' => [$issueId],
-					'status' => STATUS_PUBLISHED,
-					'orderBy' => 'seq',
-					'orderDirection' => 'ASC',
-				]));
-				foreach ($issueSubmissions as $submission) {
-					if (!$sectionId = $submission->getCurrentPublication()->getData('sectionId')) {
-						continue;
-					}
-					$issueSubmissionsInSection[$sectionId]['articles'][] = $submission;
-				}
+				$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+				$publishedArticles = $publishedArticleDao->getPublishedArticlesInSections($issue->getId(), true);
 				$templateMgr->assign('issue', $issue);
-				$templateMgr->assign('publishedSubmissions', $issueSubmissionsInSection);
+				$templateMgr->assign('publishedSubmissions', $publishedArticles);
 				$message = $templateMgr->fetch('frontend/objects/issue_toc.tpl');
 			}
 		}
