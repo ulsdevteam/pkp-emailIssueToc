@@ -11,8 +11,6 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-$bit = NOTIFICATION_TYPE_PUBLISHED_ISSUE | NOTIFICATION_TYPE_PLUGIN_BASE;
-define('NOTIFICATION_TYPE_PUBLISHED_ISSUE_WITH_TOC', $bit);
 
 class emailIssueTocPlugin extends GenericPlugin{
 
@@ -55,11 +53,14 @@ class emailIssueTocPlugin extends GenericPlugin{
 		$journalId = $journal->getId();
 		$issue = $args[0];
 		$issueId = $issue->getId();
+		// The default notification won't be constructed with any useful association to the issue.
+		// Cancel it.
 		if ($request->getUserVar('sendIssueNotification')) {
 			$request->_requestVars['sendIssueNotification'] =  NULL;
 		} else {
 			return false;
 		}
+		// Create our own notification, with the issue association
 		import('classes.notification.NotificationManager');
 		$notificationManager = new NotificationManager();
 		$notificationUsers = array();
@@ -71,7 +72,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 		}
 		foreach ($notificationUsers as $userRole) {
 			$notificationManager->createNotification(
-					$request, $userRole['id'], NOTIFICATION_TYPE_PUBLISHED_ISSUE_WITH_TOC,
+					$request, $userRole['id'], NOTIFICATION_TYPE_PUBLISHED_ISSUE,
 					$journalId, ASSOC_TYPE_ISSUE, $issueId
 			);
 		}
@@ -89,7 +90,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 		$notification = $args[0];
 		$message =& $args[1];
 		$journal = $request->getJournal();
-		if ($notification->getType() == NOTIFICATION_TYPE_PUBLISHED_ISSUE_WITH_TOC) {
+		if ($notification->getType() == NOTIFICATION_TYPE_PUBLISHED_ISSUE) {
 			if ($notification->getAssocType() == ASSOC_TYPE_ISSUE) {
 				$issueId = $notification->getAssocId();
 				$templateMgr = TemplateManager::getManager($request);
@@ -119,7 +120,8 @@ class emailIssueTocPlugin extends GenericPlugin{
 				}
 				$templateMgr->assign('issue', $issue);
 				$templateMgr->assign('publishedSubmissions', $issueSubmissionsInSection);
-				$message = $templateMgr->fetch('frontend/objects/issue_toc.tpl');
+				$message = '<div>'.__('notification.type.issuePublished').'</div>';
+				$message .= $templateMgr->fetch('frontend/objects/issue_toc.tpl');
 			}
 		}
 		return false;
