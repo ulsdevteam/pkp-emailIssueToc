@@ -86,7 +86,16 @@ class emailIssueTocPlugin extends GenericPlugin{
 	 * @return boolean False to continue execution
 	 */
 	function sendToc($hookname, $args) {
-		$request = $this->getRequest();
+		$application = Application::getApplication();
+		$request = $application->getRequest();
+		$dispatcher = $application->getDispatcher();
+		// The TemplateManager needs to see this Request based on a PageRouter, not the current ComponentRouter
+		import('classes.core.PageRouter');
+		$pageRouter = new PageRouter();
+		$pageRouter->setApplication($application);
+		$pageRouter->setDispatcher($dispatcher);
+		$request->setRouter($pageRouter);
+		$request->setDispatcher($dispatcher);
 		$notification = $args[0];
 		$message =& $args[1];
 		if ($notification->getType() == NOTIFICATION_TYPE_PUBLISHED_ISSUE) {

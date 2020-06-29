@@ -10,5 +10,5 @@
 <locale name="en_US" full_name="U.S. English">
 	<!-- EmailTOC -->
 	<message key="plugins.generic.emailIssueToc.displayName">Email Issue TOC Plugin</message>
-	<message key="plugins.generic.emailIssueToc.description"><![CDATA[Integrate OJS with the Email TOC Plugin to send the table of contents in an email.]]></message>
+	<message key="plugins.generic.emailIssueToc.description"><![CDATA[Enhances the default email notification when publishing an issue to send the full table of contents in the email.]]></message>
 </locale>
