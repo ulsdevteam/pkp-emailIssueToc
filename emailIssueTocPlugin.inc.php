@@ -86,7 +86,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 	 * @return boolean False to continue execution
 	 */
 	function sendToc($hookname, $args) {
-		$application = Application::getApplication();
+		$application = Application::get();
 		$request = $application->getRequest();
 		$dispatcher = $application->getDispatcher();
 		// The TemplateManager needs to see this Request based on a PageRouter, not the current ComponentRouter

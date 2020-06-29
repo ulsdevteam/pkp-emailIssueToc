@@ -4,7 +4,7 @@ Plugin for OJS, sends the table of content in the notification email
 
 ## Requirements
 
-* OJS/OMP 3.1.2 or later
+* OJS/OMP 3.2 or later
 
 ## Configuration
 
