@@ -114,10 +114,14 @@ class emailIssueTocPlugin extends GenericPlugin{
 					];
 				}
 				import('classes.submission.Submission');
+				$allowedStatuses = [STATUS_PUBLISHED];
+				if (!$issue->getPublished()) {
+					$allowedStatuses[] = STATUS_SCHEDULED;
+				}
 				$issueSubmissions = iterator_to_array(Services::get('submission')->getMany([
 					'contextId' => $journal->getId(),
 					'issueIds' => [$issueId],
-					'status' => STATUS_PUBLISHED,
+					'status' => $allowedStatuses,
 					'orderBy' => 'seq',
 					'orderDirection' => 'ASC',
 				]));
