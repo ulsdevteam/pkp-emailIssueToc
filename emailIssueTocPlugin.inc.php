@@ -88,53 +88,59 @@ class emailIssueTocPlugin extends GenericPlugin{
 	function sendToc($hookname, $args) {
 		$application = Application::get();
 		$request = $application->getRequest();
-		$dispatcher = $application->getDispatcher();
-		// The TemplateManager needs to see this Request based on a PageRouter, not the current ComponentRouter
-		import('classes.core.PageRouter');
-		$pageRouter = new PageRouter();
-		$pageRouter->setApplication($application);
-		$pageRouter->setDispatcher($dispatcher);
-		$request->setRouter($pageRouter);
-		$request->setDispatcher($dispatcher);
 		$notification = $args[0];
 		$message =& $args[1];
 		$journal = $request->getJournal();
 		if ($notification->getType() == NOTIFICATION_TYPE_PUBLISHED_ISSUE) {
 			if ($notification->getAssocType() == ASSOC_TYPE_ISSUE) {
 				$issueId = $notification->getAssocId();
-				$templateMgr = TemplateManager::getManager($request);
 				$issueDao = DAORegistry::getDAO('IssueDAO');
 				$issue = $issueDao->getById($issueId);
-				$sections = Application::get()->getSectionDao()->getByIssueId($issueId);
-				$issueSubmissionsInSection = [];
-				foreach ($sections as $section) {
-					$issueSubmissionsInSection[$section->getId()] = [
-						'title' => $section->getLocalizedTitle(),
-						'articles' => [],
-					];
-				}
-				import('classes.submission.Submission');
-				$allowedStatuses = [STATUS_PUBLISHED];
-				if (!$issue->getPublished()) {
-					$allowedStatuses[] = STATUS_SCHEDULED;
-				}
-				$issueSubmissions = iterator_to_array(Services::get('submission')->getMany([
-					'contextId' => $journal->getId(),
-					'issueIds' => [$issueId],
-					'status' => $allowedStatuses,
-					'orderBy' => 'seq',
-					'orderDirection' => 'ASC',
-				]));
-				foreach ($issueSubmissions as $submission) {
-					if (!$sectionId = $submission->getCurrentPublication()->getData('sectionId')) {
-						continue;
+				if ($issue) {
+					$dispatcher = $application->getDispatcher();
+					$originalRouter = $request->getRouter();
+					$originalDispatcher = $request->getDispatcher();
+					// The TemplateManager needs to see this Request based on a PageRouter, not the current ComponentRouter
+					import('classes.core.PageRouter');
+					$pageRouter = new PageRouter();
+					$pageRouter->setApplication($application);
+					$pageRouter->setDispatcher($dispatcher);
+					$request->setRouter($pageRouter);
+					$request->setDispatcher($dispatcher);
+					$templateMgr = TemplateManager::getManager($request);
+					$sections = Application::get()->getSectionDao()->getByIssueId($issueId);
+					$issueSubmissionsInSection = [];
+					foreach ($sections as $section) {
+						$issueSubmissionsInSection[$section->getId()] = [
+							'title' => $section->getLocalizedTitle(),
+							'articles' => [],
+						];
 					}
-					$issueSubmissionsInSection[$sectionId]['articles'][] = $submission;
+					import('classes.submission.Submission');
+					$allowedStatuses = [STATUS_PUBLISHED];
+					if (!$issue->getPublished()) {
+						$allowedStatuses[] = STATUS_SCHEDULED;
+					}
+					$issueSubmissions = iterator_to_array(Services::get('submission')->getMany([
+						'contextId' => $journal->getId(),
+						'issueIds' => [$issueId],
+						'status' => $allowedStatuses,
+						'orderBy' => 'seq',
+						'orderDirection' => 'ASC',
+					]));
+					foreach ($issueSubmissions as $submission) {
+						if (!$sectionId = $submission->getCurrentPublication()->getData('sectionId')) {
+							continue;
+						}
+						$issueSubmissionsInSection[$sectionId]['articles'][] = $submission;
+					}
+					$templateMgr->assign('issue', $issue);
+					$templateMgr->assign('publishedSubmissions', $issueSubmissionsInSection);
+					$message = '<div>'.__('notification.type.issuePublished').'</div>';
+					$message .= $templateMgr->fetch('frontend/objects/issue_toc.tpl');
+					$request->setRouter($originalRouter);
+					$request->setDispatcher($originalDispatcher);
 				}
-				$templateMgr->assign('issue', $issue);
-				$templateMgr->assign('publishedSubmissions', $issueSubmissionsInSection);
-				$message = '<div>'.__('notification.type.issuePublished').'</div>';
-				$message .= $templateMgr->fetch('frontend/objects/issue_toc.tpl');
 			}
 		}
 		return false;
