@@ -15,4 +15,4 @@ msgid "plugins.generic.emailIssueToc.displayName"
 msgstr "Email Issue TOC Plugin"
 
 msgid "plugins.generic.emailIssueToc.description"
-msgstr "Arricchisce la mail di notifica di default inviata alla pubblicazione di un nuovo fascoclo includendo il sommario completo."
+msgstr "Arricchisce la mail di notifica di default inviata alla pubblicazione di un nuovo fascicolo includendo il sommario completo."
