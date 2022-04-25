@@ -10,7 +10,7 @@
 <version>
 	<application>emailIssueToc</application>
 	<type>plugins.generic</type>
-	<release>1.2.0.0</release>
+	<release>1.0.2.2</release>
 	<date>2022-04-25</date>
 	<lazy-load>1</lazy-load>
 	<class>emailIssueTocPlugin</class>
