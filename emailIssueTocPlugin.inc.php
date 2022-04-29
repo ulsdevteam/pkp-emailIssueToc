@@ -21,7 +21,6 @@ class emailIssueTocPlugin extends GenericPlugin{
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
-			HookRegistry::register('IssueGridHandler::publishIssue', array(&$this, 'createNewNotification'));
 			HookRegistry::register('NotificationManager::getNotificationMessage', array(&$this, 'sendToc'));
 			}
 		return $success;
@@ -39,44 +38,6 @@ class emailIssueTocPlugin extends GenericPlugin{
 	 */
 	function getDescription() {
 		return __('plugins.generic.emailIssueToc.description');
-	}
-	
-	/**
-	 * Create a new notification using the new notification type
-	 * @param string $hookname issuegridhandler::publishissue
-	 * @param array $args Description
-	 * @return boolean False to continue execution
-	 */
-	function createNewNotification($hookname, $args) {
-		$request = $this->getRequest();
-		$journal = $request->getJournal();
-		$journalId = $journal->getId();
-		$issue = $args[0];
-		$issueId = $issue->getId();
-		// The default notification won't be constructed with any useful association to the issue.
-		// Cancel it.
-		if ($request->getUserVar('sendIssueNotification')) {
-			$request->_requestVars['sendIssueNotification'] =  NULL;
-		} else {
-			return false;
-		}
-		// Create our own notification, with the issue association
-		import('classes.notification.NotificationManager');
-		$notificationManager = new NotificationManager();
-		$notificationUsers = array();
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-		$allUsers = $userGroupDao->getUsersByContextId($journalId);
-		while ($user = $allUsers->next()) {
-			if ($user->getDisabled()) continue;
-			$notificationUsers[] = array('id' => $user->getId());
-		}
-		foreach ($notificationUsers as $userRole) {
-			$notificationManager->createNotification(
-					$request, $userRole['id'], NOTIFICATION_TYPE_PUBLISHED_ISSUE,
-					$journalId, ASSOC_TYPE_ISSUE, $issueId
-			);
-		}
-		return false;
 	}
 	
 	/**
