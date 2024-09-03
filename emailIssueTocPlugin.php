@@ -9,8 +9,17 @@
  * @brief EmailIssueToc plugin class
  * @author suk117
  */
-
-import('lib.pkp.classes.plugins.GenericPlugin');
+namespace APP\plugins\generic\emailIssueToc;
+//import('lib.pkp.classes.plugins.GenericPlugin');
+use PKP\plugins\GenericPlugin;
+use PKP\config\Config;
+use PKP\plugins\Hook;
+use PKP\db\DAORegistry;
+use APP\submission\Submission;
+use APP\core\Services;
+use APP\core\PageRouter;
+use APP\template\TemplateManager;
+use APP\core\Application;
 
 class emailIssueTocPlugin extends GenericPlugin{
 
@@ -21,7 +30,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 		$success = parent::register($category, $path, $mainContextId);
 		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
 		if ($success && $this->getEnabled()) {
-			HookRegistry::register('NotificationManager::getNotificationMessage', array(&$this, 'sendToc'));
+			Hook::add('NotificationManager::getNotificationMessage', array(&$this, 'sendToc'));
 			}
 		return $success;
 	}
@@ -62,7 +71,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 					$originalRouter = $request->getRouter();
 					$originalDispatcher = $request->getDispatcher();
 					// The TemplateManager needs to see this Request based on a PageRouter, not the current ComponentRouter
-					import('classes.core.PageRouter');
+					//import('classes.core.PageRouter');
 					$pageRouter = new PageRouter();
 					$pageRouter->setApplication($application);
 					$pageRouter->setDispatcher($dispatcher);
@@ -77,7 +86,7 @@ class emailIssueTocPlugin extends GenericPlugin{
 							'articles' => [],
 						];
 					}
-					import('classes.submission.Submission');
+					//import('classes.submission.Submission');
 					$allowedStatuses = [STATUS_PUBLISHED];
 					if (!$issue->getPublished()) {
 						$allowedStatuses[] = STATUS_SCHEDULED;
