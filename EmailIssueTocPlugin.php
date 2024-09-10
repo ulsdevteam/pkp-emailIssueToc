@@ -21,17 +21,19 @@ use APP\core\PageRouter;
 use APP\template\TemplateManager;
 use APP\core\Application;
 
-class emailIssueTocPlugin extends GenericPlugin{
+class EmailIssueTocPlugin extends GenericPlugin{
 
 	/**
 	 * @copydoc LazyLoadPlugin::register()
 	 */
 	function register($category, $path, $mainContextId = NULL) {
 		$success = parent::register($category, $path, $mainContextId);
-		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
+		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
+			return true;
+		}
 		if ($success && $this->getEnabled()) {
 			Hook::add('NotificationManager::getNotificationMessage', array(&$this, 'sendToc'));
-			}
+		}
 		return $success;
 	}
 
